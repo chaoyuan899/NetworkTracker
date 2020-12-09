@@ -93,7 +93,10 @@
     if (delegate) {
         NSString *selectorName = [[@"set_c" stringByAppendingString:@"ollectsT"] stringByAppendingString:@"imingData:"];
         SEL selector = NSSelectorFromString(selectorName);
-        [configuration performSelector:selector withObject:@(YES)];
+        if ([configuration respondsToSelector:selector]) { //该 selector 是 iOS 9 以下才有的，测试发现 14.2 已经移除
+            [configuration performSelector:selector withObject:@(YES)];
+        }
+        
         _NSURLSessionProxy *proxy = [[_NSURLSessionProxy alloc] initWithTarget:delegate];
         objc_setAssociatedObject(delegate ,@"_NSURLSessionProxy" ,proxy, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return [self swizzledSessionWithConfiguration:configuration delegate:(id<NSURLSessionDelegate>)proxy delegateQueue:queue];
